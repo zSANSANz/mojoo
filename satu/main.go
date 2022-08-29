@@ -1,32 +1,28 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"gorm-test/controllers"
-	"net/http"
+	"Satu/config"
+	"Satu/routes"
+	"fmt"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	r := setupRouter()
-	_ = r.Run(":8080")
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+
+	config.InitDB()
+	//config.DropTable() //reset tables
+	config.InitialMigration()
+
+	// seeders.Seed()
+	// seeders.ItemSeed() 
+
+	e := routes.New()
+
+	e.Logger.Fatal(e.Start(":3000"))
+
 }
-
-func setupRouter() *gin.Engine {
-	r := gin.Default()
-
-	r.GET("ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "pong")
-	})
-
-	userRepo := controllers.New()
-	r.POST("/users", userRepo.CreateUser)
-	r.GET("/users", userRepo.GetUsers)
-	r.GET("/users/:id", userRepo.GetUser)
-	r.PUT("/users/:id", userRepo.UpdateUser)
-	r.DELETE("/users/:id", userRepo.DeleteUser)
-
-	return r
-}
-
-
-

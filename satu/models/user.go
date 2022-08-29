@@ -1,51 +1,16 @@
 package models
 
 import (
-	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
-	gorm.Model
-	ID    int
-	Name  string
-	Email string
-}
-
-//create a user
-func CreateUser(db *gorm.DB, User *User) (err error) {
-	err = db.Create(User).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//get users
-func GetUsers(db *gorm.DB, User *[]User) (err error) {
-	err = db.Find(User).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//get user by id
-func GetUser(db *gorm.DB, User *User, id int) (err error) {
-	err = db.Where("id = ?", id).First(User).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//update user
-func UpdateUser(db *gorm.DB, User *User) (err error) {
-	db.Save(User)
-	return nil
-}
-
-//delete user
-func DeleteUser(db *gorm.DB, User *User, id int) (err error) {
-	db.Where("id = ?", id).Delete(User)
-	return nil
+	Id        uint      `gorm:"type:bigint(20);not null" json:"id" form:"id"`
+	Name      string    `gorm:"type:varchar(45)" json:"name" form:"name"`
+	UserName  string    `gorm:"type:varchar(45)" json:"user_name" form:"user_name"`
+	Password  string    `gorm:"type:varchar(225)" json:"password" form:"password"`
+	CreateAt  string    `json:"created_at" form:"created_at"`
+	CreateBy  time.Time `gorm:"type:bigint(20)" json:"created_by" form:"created_by"`
+	UpdatedAt string    `json:"updated_at" form:"updated_at"`
+	UpdatedBy time.Time `gorm:"type:bigint(20)" json:"updated_by" form:"updated_by"`
 }
