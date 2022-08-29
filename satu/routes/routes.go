@@ -50,5 +50,26 @@ func New() *echo.Echo {
 
 	e.POST("/register", controllers.RegisterCustomerController)
 
+	e.POST("/register_user", controllers.RegisterUserController)
+	e.POST("/login_user", controllers.LoginUserController)
+
+	eJWT.GET("/merchants", controllers.GetMerchantsController)
+	eJWT.GET("/merchants/:id", controllers.GetMerchantByIdController)
+	eJWT.POST("/merchants", controllers.CreateMerchantController)
+	eJWT.PUT("/merchants/:id", controllers.UpdateMerchantByIdController)
+	eJWT.DELETE("/merchants/:id", controllers.DeleteMerchantByIdController)
+
+	eJWT.GET("/outlets", controllers.GetOutletsController)
+	eJWT.GET("/outlets/:id", controllers.GetOutletsController)
+	eJWT.POST("/outlets", controllers.CreateOutletController)
+	eJWT.PUT("/outlets/:id", controllers.UpdateOutletByIdController)
+	eJWT.DELETE("/outlets/:id", controllers.DeleteOutletByIdController)
+
+	eJWT.GET("/transactions", controllers.GetTransactionsController)
+	eJWT.GET("/transactions/:id", controllers.GetTransactionByIdController)
+	eJWT.POST("/transactions", controllers.CreateTransactionController)
+	eJWT.PUT("/transactions/:id", controllers.UpdateTransactionByIdController)
+	eJWT.DELETE("/transactions/:id", controllers.DeleteTransactionByIdController)
+
 	return e
 }
