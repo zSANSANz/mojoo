@@ -1,0 +1,2 @@
+1. golang tidak mengijinkan memberi nama variable yang dibuat dengan nama type
+2. didalam golang cara memberi value pada  sebuah variable string tidak boleh dengan ‘persegi panjang’ dapat diganti menjadi "persegi panjang"
