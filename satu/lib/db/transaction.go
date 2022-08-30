@@ -3,6 +3,10 @@ package db
 import (
 	"Satu/config"
 	"Satu/models"
+	"fmt"
+	"math"
+	"net/http"
+	"strings"
 )
 
 func GetTransactions() (interface{}, error) {
@@ -11,7 +15,10 @@ func GetTransactions() (interface{}, error) {
 	if err := config.DB.Find(&transaction).Error; err != nil {
 		return nil, err
 	}
-	return transaction, nil
+
+	paginatedData, _ := paginate.New(transaction).Find()
+
+	return paginatedData, nil
 }
 
 func GetTransactionById(id string) (interface{}, error) {
@@ -53,4 +60,62 @@ func DeleteTransaction(id string) (interface{}, error) {
 		return nil, deleteErr
 	}
 	return transaction, nil
+}
+
+func paginate(value interface{}, pagination *models.Pagination, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+	var totalRows int64
+	db.Model(value).Count(&totalRows)
+
+	pagination.TotalRows = totalRows
+	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.Limit)))
+	pagination.TotalPages = totalPages
+
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Order(pagination.GetSort())
+	}
+}
+
+type TransactionGorm struct {
+	db *gorm.DB
+}
+
+func (cg *TransactionGorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
+	var transaction []*Transaction
+
+	tokenString := ""
+
+	// get jwt bearer token from context
+	for key, values := range c.Request().Header {
+		for _, value := range values {
+			if key == "Authorization" {
+				tokenString = strings.Replace(value, "Bearer ", "", -1)
+
+			}
+		}
+	}
+
+	// decode token with secret code bermaslaah
+	claims := jwt.MapClaims{}
+	token, _ := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte("bermaslaah"), nil
+	})
+
+	if !token.Valid {
+		fmt.Println("invalid jwt token!!!")
+	}
+
+	if users.id != transaction.id {
+		// fmt.Println("kamu bukanlah head")
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"status":     "false",
+			"message":    "Unauthorized: Access is denied due to invalid credentials",
+			"error_code": "401",
+			"data":       users,
+		})
+	} else {
+		cg.db.Scopes(paginate(transaction, &pagination, cg.db)).Find(&transaction)
+		pagination.Rows = transaction
+	}
+
+	return &pagination, nil
 }
